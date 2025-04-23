@@ -96,7 +96,7 @@ export default function PedidoPage() {
     let message = `*NOVO PEDIDO*\n\n`
     message += `*Cliente:* ${formData.name}\n`
     message += `*Telefone:* ${formData.phone}\n`
-
+  
     // Adicionar endereço se for entrega
     if (deliveryType === "delivery") {
       message += `*Endereço:* ${formData.address}\n`
@@ -104,23 +104,26 @@ export default function PedidoPage() {
         message += `*Complemento:* ${formData.complement}\n`
       }
     }
-
+  
     message += `*Tipo:* ${deliveryType === "delivery" ? "Entrega" : "Retirada"}\n`
     message += `*Horário:* ${formData.time}\n`
     message += `*Pagamento:* ${formData.paymentMethod === "cash" ? "Dinheiro" : formData.paymentMethod === "card" ? "Cartão" : "PIX"}\n\n`
-
-    // Adicionar itens do pedido
+  
+    // Adicionar itens do pedido e recalcular o total
+    let recalculatedTotal = 0
     message += `*ITENS DO PEDIDO:*\n`
     items.forEach((item) => {
-      message += `• ${item.quantity}x ${item.name} - R$ ${(item.price * item.quantity).toFixed(2).replace(".", ",")}\n`
+      const itemTotal = item.price * item.quantity
+      recalculatedTotal += itemTotal
+      message += `• ${item.quantity}x ${item.name} - R$ ${itemTotal.toFixed(2).replace(".", ",")}\n`
       if (item.observations) {
         message += `   _Obs: ${item.observations}_\n`
       }
     })
-
-    // Adicionar total
-    message += `\n*TOTAL: R$ ${total.toFixed(2).replace(".", ",")}*`
-
+  
+    // Adicionar total recalculado
+    message += `\n*TOTAL: R$ ${recalculatedTotal.toFixed(2).replace(".", ",")}*`
+  
     return encodeURIComponent(message)
   }
 
