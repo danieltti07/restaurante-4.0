@@ -1,4 +1,5 @@
-/** @type {import('next').NextConfig} */
+// next.config.mjs
+
 const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
@@ -16,6 +17,6 @@ const nextConfig = {
       },
     ],
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;
