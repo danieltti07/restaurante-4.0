@@ -34,6 +34,10 @@ export default function PedidoPage() {
   const [showPixQRCode, setShowPixQRCode] = useState(false)
   const [pixCode, setPixCode] = useState("")
   const [phoneError, setPhoneError] = useState("")
+  const [completedOrder, setCompletedOrder] = useState<{
+    items: typeof items
+    total: number
+  } | null>(null)
 
   // Preencher os dados do formulário com os dados do usuário logado
   useEffect(() => {
@@ -92,11 +96,18 @@ export default function PedidoPage() {
 
   // Função para formatar mensagem de WhatsApp
   const formatWhatsAppMessage = () => {
+    if (!completedOrder) {
+      alert("Erro: Nenhum pedido concluído encontrado.")
+      return ""
+    }
+
+    const { items, total } = completedOrder
+
     // Formatar cabeçalho do pedido
     let message = `*NOVO PEDIDO*\n\n`
     message += `*Cliente:* ${formData.name}\n`
     message += `*Telefone:* ${formData.phone}\n`
-  
+
     // Adicionar endereço se for entrega
     if (deliveryType === "delivery") {
       message += `*Endereço:* ${formData.address}\n`
@@ -104,11 +115,11 @@ export default function PedidoPage() {
         message += `*Complemento:* ${formData.complement}\n`
       }
     }
-  
+
     message += `*Tipo:* ${deliveryType === "delivery" ? "Entrega" : "Retirada"}\n`
     message += `*Horário:* ${formData.time}\n`
     message += `*Pagamento:* ${formData.paymentMethod === "cash" ? "Dinheiro" : formData.paymentMethod === "card" ? "Cartão" : "PIX"}\n\n`
-  
+
     // Adicionar itens do pedido e recalcular o total
     let recalculatedTotal = 0
     message += `*ITENS DO PEDIDO:*\n`
@@ -120,10 +131,10 @@ export default function PedidoPage() {
         message += `   _Obs: ${item.observations}_\n`
       }
     })
-  
+
     // Adicionar total recalculado
     message += `\n*TOTAL: R$ ${recalculatedTotal.toFixed(2).replace(".", ",")}*`
-  
+
     return encodeURIComponent(message)
   }
 
@@ -176,6 +187,11 @@ export default function PedidoPage() {
         paymentMethod: formData.paymentMethod,
       })
 
+      // Salvar os dados do pedido concluído
+      setCompletedOrder({
+        items: [...items], // Copiar os itens do carrinho
+        total, // Salvar o total
+      })
       setOrderId(newOrderId)
       setOrderComplete(true)
       clearCart()
@@ -202,15 +218,7 @@ export default function PedidoPage() {
               <button
                 onClick={sendToWhatsApp}
                 className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="w-5 h-5 mr-2"
                 >
-                  <path d="M12 2C6.48 2 2 6.48 2 12c0 1.82.49 3.53 1.35 5L2 22l5.05-1.35C8.47 21.51 10.18 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm5.46 14.06c-.25.71-1.49 1.34-2.06 1.35-.56.01-1.08.21-3.54-.89-2.97-1.33-4.88-4.61-5.03-4.83-.15-.21-1.2-1.6-1.2-3.05 0-1.45.74-2.15 1.02-2.45.28-.3.6-.37.8-.37.2 0 .4 0 .58.01.2.01.45-.06.7.53.25.58.85 2.03.93 2.18.08.14.13.31.04.5-.1.19-.14.31-.28.48-.14.17-.3.38-.42.51-.14.14-.29.29-.12.56.16.27.73 1.15 1.57 1.87 1.08.91 1.98 1.19 2.27 1.33.28.14.45.12.62-.07.17-.19.74-.86.94-1.15.2-.29.4-.24.67-.14.27.09 1.7.8 1.99.94.29.15.49.22.56.34.07.12.07.71-.18 1.4z" />
-                </svg>
                 Enviar pedido no WhatsApp
               </button>
 
