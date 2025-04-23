@@ -218,7 +218,7 @@ export default function PedidoPage() {
               <button
                 onClick={sendToWhatsApp}
                 className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center"
-                >
+              >
                 Enviar pedido no WhatsApp
               </button>
 
@@ -469,4 +469,4 @@ export default function PedidoPage() {
       </div>
     </div>
   )
-}
+} 
