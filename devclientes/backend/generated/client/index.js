@@ -119,7 +119,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\daniel.tutui\\Documents\\devclientes\\backend\\generated\\client",
+      "value": "C:\\Users\\daniel.tutui\\Documents\\restaurante_4.0\\devclientes\\backend\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -133,7 +133,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\daniel.tutui\\Documents\\devclientes\\backend\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\daniel.tutui\\Documents\\restaurante_4.0\\devclientes\\backend\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
