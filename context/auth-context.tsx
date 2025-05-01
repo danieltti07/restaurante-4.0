@@ -34,11 +34,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false)
   }, [])
 
+  // Definindo a URL do backend que pode ser configurada com uma variável de ambiente
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://restaurante-4-0.onrender.com"; // Usando a URL do Render ou localhost em desenvolvimento
+
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true)
 
     try {
-      const res = await fetch("http://localhost:3333/login", {
+      const res = await fetch(`${API_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -75,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true)
 
     try {
-      const res = await fetch("http://localhost:3333/customers", {
+      const res = await fetch(`${API_URL}/customers`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
