@@ -26,94 +26,86 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  // Verificar se o usuário está logado ao carregar a página
   useEffect(() => {
     const storedUser = localStorage.getItem("user")
     if (storedUser) {
       setUser(JSON.parse(storedUser))
     }
-
-    // Criar usuário admin se não existir
-    const users = JSON.parse(localStorage.getItem("users") || "[]")
-    const adminExists = users.some((u: any) => u.email === "admin@restaurante.com")
-
-    if (!adminExists) {
-      const adminUser = {
-        id: "user_admin",
-        name: "Administrador",
-        email: "admin@restaurante.com",
-        password: "admin123",
-        role: "admin",
-        createdAt: new Date().toISOString(),
-      }
-
-      users.push(adminUser)
-      localStorage.setItem("users", JSON.stringify(users))
-    }
-
     setIsLoading(false)
   }, [])
 
-  // Simular login (em um app real, isso seria uma chamada de API)
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true)
 
-    // Simular delay de rede
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
     try {
-      // Verificar se o usuário existe no localStorage
-      const users = JSON.parse(localStorage.getItem("users") || "[]")
-      const foundUser = users.find((u: any) => u.email === email)
+      const res = await fetch("http://localhost:3333/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      })
 
-      if (foundUser && foundUser.password === password) {
-        // Remover a senha antes de armazenar no estado
-        const { password: _, ...userWithoutPassword } = foundUser
-        setUser(userWithoutPassword)
-        localStorage.setItem("user", JSON.stringify(userWithoutPassword))
-        return true
+      if (!res.ok) {
+        const errorData = await res.json()
+        console.error("Erro de login:", errorData)
+        return false
       }
+
+      const data = await res.json()
+
+      setUser(data)
+      localStorage.setItem("user", JSON.stringify(data))
+
+      return true
+    } catch (error) {
+      console.error("Erro ao fazer login:", error)
       return false
     } finally {
       setIsLoading(false)
     }
   }
 
-  // Simular registro (em um app real, isso seria uma chamada de API)
-  const register = async (name: string, email: string, password: string, phone?: string): Promise<boolean> => {
+  const register = async (
+    name: string,
+    email: string,
+    password: string,
+    phone?: string
+  ): Promise<boolean> => {
     setIsLoading(true)
 
-    // Simular delay de rede
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
     try {
-      // Verificar se o email já está em uso
-      const users = JSON.parse(localStorage.getItem("users") || "[]")
-      if (users.some((u: any) => u.email === email)) {
+      const res = await fetch("http://localhost:3333/customers", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, password, phone }),
+      })
+
+      if (!res.ok) {
+        const errorData = await res.json()
+        console.error("Erro de registro:", errorData)
         return false
       }
 
-      // Criar novo usuário
-      const newUser = {
-        id: `user_${Date.now()}`,
-        name,
-        email,
-        password,
-        phone,
-        role: "customer", // Papel padrão para novos usuários
-        createdAt: new Date().toISOString(),
+      const data = await res.json()
+
+      const userWithoutPassword = {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        role: "customer", // Ajuste conforme o role de seu sistema
       }
 
-      // Salvar no "banco de dados" (localStorage)
-      users.push(newUser)
-      localStorage.setItem("users", JSON.stringify(users))
-
-      // Fazer login automático
-      const { password: _, ...userWithoutPassword } = newUser
       setUser(userWithoutPassword)
       localStorage.setItem("user", JSON.stringify(userWithoutPassword))
 
       return true
+    } catch (error) {
+      console.error("Erro ao registrar:", error)
+      return false
     } finally {
       setIsLoading(false)
     }
