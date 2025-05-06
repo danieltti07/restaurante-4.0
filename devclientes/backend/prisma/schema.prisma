@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-3.0.x"]
   //output = "./generated/client"
 }
@@ -19,12 +19,35 @@ model Customer {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String
   email     String   @unique
-  status    Boolean @default(true)
+  status    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   password  String
   phone     String   @unique
 
+  orders Order[] // ← relação com pedidos
 
   @@map("customers")
+}
+
+model Order {
+  id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  customer   Customer    @relation(fields: [customerId], references: [id])
+  customerId String
+  items      OrderItem[]
+  status     String      @default("preparando") // opções: preparando, entrega, finalizado
+  createdAt  DateTime    @default(now())
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  order    Order  @relation(fields: [orderId], references: [id])
+  orderId  String
+  name     String
+  price    Float
+  quantity Int
+
+  @@map("order_items")
 }
