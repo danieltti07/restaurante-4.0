@@ -17,6 +17,7 @@ model Customer {
   updatedAt DateTime @updatedAt
   password  String
   phone     String   @unique
+  role      String   @default("user") // Valores: "user" ou "admin"
 
   orders    Order[]
 
