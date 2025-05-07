@@ -43,6 +43,7 @@ const start = async () => {
     await app.register(cors, {
       origin: ['http://localhost:3000', 'https://restaurante-4-0-bay.vercel.app'], // Altere para seu domínio do Vercel
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
       credentials: true,
     });
 
