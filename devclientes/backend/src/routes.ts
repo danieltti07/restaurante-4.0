@@ -4,6 +4,7 @@ import { ListCustomersController } from './controllers/ListCustomerController';
 import { DeleteCustomerController } from './controllers/DeleteCustomerController';
 import { LoginCustomerController } from './controllers/LoginCustomerController';
 import { CreateOrderController } from './controllers/CreateOrderController';
+import { SetCustomerRoleController } from './controllers/SetCustomerRoleController';
 import prismaClient from './prisma'; // ou o caminho correto para o seu arquivo prisma
 
 export async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
@@ -73,5 +74,9 @@ fastify.patch('/orders/:orderId/status', async (request, reply) => {
     }
   })
   
+  // NOVA ROTA: atualizar o role do cliente
+  fastify.post("/set-customer-role", async (request: FastifyRequest, reply: FastifyReply) => {
+    return new SetCustomerRoleController().handle(request, reply);
+  });
 
 }
