@@ -20,6 +20,7 @@ export class LoginCustomerController {
         status: true,   // Garante que status venha
         createdAt: true,
         updatedAt: true,
+        role: true,
       },
     });
 
@@ -39,6 +40,7 @@ export class LoginCustomerController {
       name: customer.name,
       email: customer.email,
       status: customer.status,
+      role: customer.role, // Adicione o campo role aqui
     });
   }
 }
