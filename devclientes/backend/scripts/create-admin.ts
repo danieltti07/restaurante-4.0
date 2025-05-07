@@ -6,7 +6,7 @@ const prisma = new PrismaClient()
 async function main() {
   // Substitua os dados abaixo pelo desejado
   const adminEmail = "admin@restaurante.com"
-  const adminPassword = "senhaSuperSecreta123"
+  const adminPassword = "admin123"
   const hashedPassword = await bcrypt.hash(adminPassword, 10)
 
   // Opcional: acrescente o campo role ou similar se usar controle de role
