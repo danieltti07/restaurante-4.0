@@ -5,9 +5,18 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/context/auth-context"
 import { Clock, Package, Truck, CheckCircle, XCircle, Search, Filter } from "lucide-react"
 import Link from "next/link"
-
-// Importar o contexto de pedidos
 import { useOrders, type Order } from "@/context/order-context"
+
+// DEBUGGING: Mostra dados do usuário no console para diagnóstico.
+// (Remova em produção!)
+function DebugUser({ user }: { user: any }) {
+  useEffect(() => {
+    if (user) {
+      console.log("[ADMIN] Usuário autenticado:", user)
+    }
+  }, [user])
+  return null
+}
 
 export default function AdminPage() {
   const { isAuthenticated, isLoading, user } = useAuth()
@@ -18,8 +27,16 @@ export default function AdminPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [searchTerm, setSearchTerm] = useState("")
   const [isUpdating, setIsUpdating] = useState<string | null>(null)
+  const [showDebug, setShowDebug] = useState(false)
 
-  // Verificar se o usuário é admin
+  // Verificação segura do perfil ADMIN
+  const notAdmin =
+    !isLoading &&
+    isAuthenticated &&
+    user &&
+    user.role !== "admin"
+
+  // Redireciona após login se NÃO for admin
   useEffect(() => {
     if (!isLoading) {
       if (!isAuthenticated) {
@@ -29,6 +46,17 @@ export default function AdminPage() {
       }
     }
   }, [isLoading, isAuthenticated, user, router])
+
+  useEffect(() => {
+    if (notAdmin) {
+      alert(
+        "Seu acesso ao ADMIN foi negado.\nVerifique com o responsável pela configuração de permissões."
+      )
+    }
+  }, [notAdmin])
+
+  // Mostra info de contexto para debugging (opcional — botão na interface)
+  const handleShowDebug = () => setShowDebug((s) => !s)
 
   // Filtrar pedidos
   useEffect(() => {
@@ -123,18 +151,36 @@ export default function AdminPage() {
     return (
       <div className="section-padding">
         <div className="container-custom max-w-6xl mx-auto text-center">
-          <p>Carregando...</p>
+          <p>Carregando painel de admin...</p>
         </div>
       </div>
     )
   }
 
+  // Se não autenticado, ou não é admin: (fallback extra)
   if (!isAuthenticated || user?.role !== "admin") {
-    return null // Redirecionamento já está sendo tratado no useEffect
+    return (
+      <div className="section-padding">
+        <div className="container-custom max-w-4xl mx-auto text-center">
+          <p>Você não tem permissão para acessar esta área.</p>
+          <button onClick={handleShowDebug} className="mt-4 text-blue-400 underline text-sm">
+            {showDebug ? 'Ocultar detalhes do usuário' : 'Mostrar detalhes do usuário'}
+          </button>
+          {showDebug && (
+            <div className="mt-4 text-left text-xs break-all bg-gray-100 rounded p-2">
+              <pre>{JSON.stringify(user, null, 2)}</pre>
+              <p>isAuthenticated: {String(isAuthenticated)}</p>
+              <p>isLoading: {String(isLoading)}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="section-padding bg-gray-50">
+      <DebugUser user={user} />
       <div className="container-custom max-w-6xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">Painel de Administração</h1>
 
