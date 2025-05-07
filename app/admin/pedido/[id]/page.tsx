@@ -126,8 +126,8 @@ export default function AdminOrderDetailPage({ params }: { params: { id: string 
     // Garantir que o número comece com o código do país (Brasil: 55)
     const formattedPhone = customerPhone.startsWith("55") ? customerPhone : `55${customerPhone}`
 
-    const message = `Olá ${order.deliveryInfo.name}, sobre seu pedido #${order.id.split("_")[1]} em Seu Restaurante:`
-    const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`
+    const message = formatWhatsAppMessage(order)
+    const whatsappUrl = `https://wa.me/${formattedPhone}?text=${message}`
 
     // Abrir WhatsApp em uma nova aba
     window.open(whatsappUrl, "_blank")

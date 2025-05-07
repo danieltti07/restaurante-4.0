@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useEffect } from "react"
@@ -6,11 +7,18 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/context/auth-context"
 import { useOrders } from "@/context/order-context"
 import { Clock, Package, Truck, CheckCircle, XCircle } from "lucide-react"
+import { useSocket } from "../hooks/useSocket"
 
 export default function MyOrdersPage() {
   const { isAuthenticated, isLoading } = useAuth()
   const { getUserOrders } = useOrders()
   const router = useRouter()
+  const orders = getUserOrders()
+
+  // Atualiza pedidos em tempo real quando houver mudança de status
+  useSocket(() => {
+    getUserOrders()
+  })
 
   // Redirecionar se não estiver autenticado
   useEffect(() => {
@@ -18,18 +26,6 @@ export default function MyOrdersPage() {
       router.push("/login")
     }
   }, [isLoading, isAuthenticated, router])
-
-  const orders = getUserOrders()
-
-  if (isLoading) {
-    return (
-      <div className="section-padding">
-        <div className="container-custom max-w-4xl mx-auto text-center">
-          <p>Carregando...</p>
-        </div>
-      </div>
-    )
-  }
 
   // Função para renderizar o ícone de status
   const getStatusIcon = (status: string) => {
@@ -130,6 +126,16 @@ export default function MyOrdersPage() {
     window.open(whatsappUrl, "_blank")
   }
 
+  if (isLoading) {
+    return (
+      <div className="section-padding">
+        <div className="container-custom max-w-4xl mx-auto text-center">
+          <p>Carregando...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="section-padding bg-gray-50">
       <div className="container-custom max-w-4xl mx-auto">
@@ -144,7 +150,7 @@ export default function MyOrdersPage() {
           </div>
         ) : (
           <div className="space-y-4">
-            {orders.map((order) => (
+            {orders.map((order: any) => (
               <div key={order.id} className="bg-white rounded-lg shadow-md overflow-hidden">
                 <div className="p-4 border-b flex justify-between items-center">
                   <div>
@@ -161,7 +167,7 @@ export default function MyOrdersPage() {
                   <div className="mb-4">
                     <h3 className="font-medium mb-2">Itens do Pedido</h3>
                     <ul className="space-y-2">
-                      {order.items.map((item, index) => (
+                      {order.items.map((item: any, index: number) => (
                         <li key={index} className="flex justify-between">
                           <span>
                             {item.quantity}x {item.name}

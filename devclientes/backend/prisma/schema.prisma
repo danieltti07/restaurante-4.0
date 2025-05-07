@@ -1,13 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-3.0.x"]
-  //output = "./generated/client"
 }
 
 datasource db {
@@ -25,29 +18,48 @@ model Customer {
   password  String
   phone     String   @unique
 
-  orders Order[] // ← relação com pedidos
+  orders    Order[]
 
   @@map("customers")
 }
 
 model Order {
-  id         String      @id @default(auto()) @map("_id") @db.ObjectId
-  customer   Customer    @relation(fields: [customerId], references: [id])
-  customerId String
-  items      OrderItem[]
-  status     String      @default("preparando") // opções: preparando, entrega, finalizado
-  createdAt  DateTime    @default(now())
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  customer        Customer      @relation(fields: [customerId], references: [id])
+  customerId      String 
+  items           OrderItem[]
+  status          String        @default("preparando")
+  createdAt       DateTime      @default(now())
+  total           Float
+  deliveryType    String
+  paymentMethod   String
+
+  deliveryInfo    DeliveryInfo? @relation(fields: [deliveryInfoId], references: [id])
+  deliveryInfoId  String?       @db.ObjectId @unique
 
   @@map("orders")
 }
 
 model OrderItem {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  order    Order  @relation(fields: [orderId], references: [id])
-  orderId  String
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  order    Order   @relation(fields: [orderId], references: [id])
+  orderId  String  @db.ObjectId
   name     String
   price    Float
   quantity Int
 
   @@map("order_items")
+}
+
+model DeliveryInfo {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  phone      String
+  address    String?
+  complement String?
+  time       String
+
+  order      Order?
+
+  @@map("delivery_info")
 }
