@@ -8,7 +8,7 @@ export interface User {
   email: string
   phone?: string
   address?: string
-  role?: string
+  role: string  // Role is now required
 }
 
 interface AuthContextType {
@@ -29,7 +29,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const storedUser = localStorage.getItem("user")
     if (storedUser) {
-      setUser(JSON.parse(storedUser))
+      try {
+        const parsed = JSON.parse(storedUser)
+        if (parsed && typeof parsed.role === "string") {
+          setUser(parsed)
+        } else {
+          setUser(null)
+          localStorage.removeItem("user")
+        }
+      } catch {
+        setUser(null)
+        localStorage.removeItem("user")
+      }
     }
     setIsLoading(false)
   }, [])
@@ -56,7 +67,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const data = await res.json()
-
+      
+      // Ensure role is present
+      if (!data.role) {
+        // Default fallback
+        data.role = "user"
+      }
+      
       setUser(data)
       localStorage.setItem("user", JSON.stringify(data))
 
@@ -94,16 +111,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const data = await res.json()
 
-      const userWithoutPassword = {
+      // Use role from backend or default to "user"
+      const userData: User = {
         id: data.id,
         name: data.name,
         email: data.email,
         phone: data.phone,
-        role: "customer", // Ajuste conforme o role de seu sistema
+        address: data.address,
+        role: data.role ?? "user"
       }
 
-      setUser(userWithoutPassword)
-      localStorage.setItem("user", JSON.stringify(userWithoutPassword))
+      setUser(userData)
+      localStorage.setItem("user", JSON.stringify(userData))
 
       return true
     } catch (error) {
