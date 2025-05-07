@@ -1,7 +1,6 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import { routes } from './routes';
-import fastifyWebsocket from 'fastify-websocket';
 import { Server as SocketIOServer } from 'socket.io'; // Importação corrigida para o Socket.IO
 
 // Criação do servidor Fastify
@@ -12,9 +11,6 @@ app.setErrorHandler((error, request, reply) => {
   app.log.error(error); // Log do erro no terminal
   reply.code(400).send({ message: error.message });
 });
-
-// Configuração do WebSocket com Fastify
-app.register(fastifyWebsocket);
 
 // Inicialize o Socket.IO após registrar o WebSocket
 const io = new SocketIOServer(app.server); // Instancia o servidor Socket.IO corretamente
