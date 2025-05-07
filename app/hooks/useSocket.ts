@@ -7,7 +7,7 @@ export const useSocket = (onStatusUpdate: (status: string) => void) => {
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    const socket = io('http://localhost:3333'); // ou seu domínio do backend
+    const socket = io('https://restaurante-4-0.onrender.com/'); // ou seu domínio do backend
     socketRef.current = socket;
 
     socket.on('connect', () => {
