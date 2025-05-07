@@ -69,15 +69,26 @@ export function OrderProvider({ children }: { children: ReactNode }) {
   const createOrder = async (
     orderData: Omit<Order, "id" | "createdAt" | "status" | "estimatedDelivery" | "currentLocation">
   ): Promise<string> => {
-    const res = await fetch("/api/orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const response = await fetch('https://restaurante-4-0.onrender.com/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(orderData),
     })
 
-    if (!res.ok) throw new Error("Erro ao criar pedido")
+    if (!response.ok) {
+      // Tenta extrair o erro enviado pelo backend, se existir
+      let errorMessage = "Erro ao criar pedido"
+      try {
+        const json = await response.json()
+        errorMessage = json.error || errorMessage
+      } catch {}
+      throw new Error(errorMessage)
+    }
 
-    const newOrder: Order = await res.json()
+    const data = await response.json()
+    const newOrder: Order = data
     setOrders((prev) => [...prev, newOrder])
     setActiveOrder(newOrder)
     return newOrder.id
